@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -277,8 +278,13 @@
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         .rupee {
@@ -287,6 +293,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="header">
@@ -329,7 +336,7 @@
                     <span>👤</span>
                     <span>Step 2: Review Proposal</span>
                 </div>
-                
+
                 <div class="employee-info">
                     <h3 style="color: #667eea; margin-bottom: 15px;">🏆 Highest-Paid Employee</h3>
                     <div class="info-grid" id="employeeInfo"></div>
@@ -347,7 +354,7 @@
                     <span>✅</span>
                     <span>Step 3: Make Your Decision</span>
                 </div>
-                
+
                 <div class="decision-buttons">
                     <button class="btn btn-approve" onclick="makeDecision('approve')">
                         ✅ Approve
@@ -376,6 +383,15 @@
                 <div id="resultBox"></div>
                 <button class="btn" onclick="resetWorkflow()">Start New Analysis</button>
             </div>
+
+            <!-- Workflow History -->
+            <div id="historySection" class="section hidden">
+                <div class="section-title">
+                    <span>📜</span>
+                    <span>Workflow History</span>
+                </div>
+                <div id="workflowHistory"></div>
+            </div>
         </div>
     </div>
 
@@ -386,13 +402,13 @@
 
         function selectDepartment(dept, element) {
             selectedDepartment = dept;
-            
+
             // Update UI
             document.querySelectorAll('.dept-card').forEach(card => {
                 card.classList.remove('selected');
             });
             element.classList.add('selected');
-            
+
             document.getElementById('analyzeBtn').disabled = false;
         }
 
@@ -406,8 +422,8 @@
             try {
                 const response = await fetch('/analyze', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({department: selectedDepartment})
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ department: selectedDepartment })
                 });
 
                 const data = await response.json();
@@ -480,12 +496,12 @@
             try {
                 const response = await fetch('/decide', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({decision: decision})
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ decision: decision })
                 });
 
                 const data = await response.json();
-                
+
                 if (data.success) {
                     showResult(data.status, data.message);
                 }
@@ -497,7 +513,7 @@
         function showModifyForm() {
             const form = document.getElementById('modifyForm');
             const inputs = document.getElementById('modifyInputs');
-            
+
             if (currentProposal.type === 'salary_hike') {
                 const details = currentProposal.details;
                 inputs.innerHTML = `
@@ -517,7 +533,7 @@
                     .filter(e => e.Employee_ID !== details.employee_id)
                     .map(e => `<option value="${e.Name}">${e.Name}</option>`)
                     .join('');
-                
+
                 inputs.innerHTML = `
                     <div class="form-group">
                         <label class="form-label">Current Manager: ${details.current_manager}</label>
@@ -529,13 +545,13 @@
                     </div>
                 `;
             }
-            
+
             form.classList.remove('hidden');
         }
 
         async function submitModification() {
             let modification = {};
-            
+
             if (currentProposal.type === 'salary_hike') {
                 modification = {
                     modified_salary: parseInt(document.getElementById('modifiedSalary').value)
@@ -549,7 +565,7 @@
             try {
                 const response = await fetch('/decide', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         decision: 'modify',
                         modification: modification
@@ -557,7 +573,7 @@
                 });
 
                 const data = await response.json();
-                
+
                 if (data.success) {
                     showResult(data.status, data.message);
                 }
@@ -570,12 +586,12 @@
             document.getElementById('step2').classList.add('hidden');
             document.getElementById('step3').classList.add('hidden');
             document.getElementById('step4').classList.remove('hidden');
-            
+
             let className = 'result-box ';
             if (status === 'approved') className += 'result-approved';
             else if (status === 'rejected') className += 'result-rejected';
             else if (status === 'modified') className += 'result-modified';
-            
+
             document.getElementById('resultBox').className = className;
             document.getElementById('resultBox').textContent = message;
         }
@@ -585,4 +601,5 @@
         }
     </script>
 </body>
+
 </html>
