@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HITL Salary Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            color: #667eea;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dept-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .dept-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .dept-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            border-color: #667eea;
+        }
+
+        .dept-card.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .dept-name {
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .dept-info {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .proposal-box {
+            background: #f0f7ff;
+            border: 2px solid #667eea;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+        }
+
+        .employee-info {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .info-item {
+            padding: 10px;
+        }
+
+        .info-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .proposal-details {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .proposal-type {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .decision-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn-approve {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .btn-reject {
+            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .btn-modify {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .modify-form {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .result-box {
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+            font-size: 1.1em;
+        }
+
+        .result-approved {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            color: #155724;
+        }
+
+        .result-rejected {
+            background: #f8d7da;
+            border: 2px solid #dc3545;
+            color: #721c24;
+        }
+
+        .result-modified {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            color: #856404;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+            font-size: 1.2em;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .rupee {
+            font-weight: bold;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💼 HITL Salary Management System</h1>
+            <p>Human-in-the-Loop Workflow powered by LangGraph</p>
+        </div>
+
+        <div class="content">
+            <!-- Step 1: Department Selection -->
+            <div id="step1" class="section">
+                <div class="section-title">
+                    <span>📊</span>
+                    <span>Step 1: Select Department to Analyze</span>
+                </div>
+                <div class="dept-grid" id="departmentGrid">
+                    {% for dept in departments %}
+                    <div class="dept-card" onclick="selectDepartment('{{ dept.name }}', this)">
+                        <div class="dept-name">{{ dept.name }}</div>
+                        <div class="dept-info">
+                            {{ dept.count }} employees<br>
+                            Avg: ₹{{ "{:,}".format(dept.avg_salary) }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <button id="analyzeBtn" class="btn" onclick="analyzeDepartment()" disabled>
+                    🔍 Analyze Department
+                </button>
+            </div>
+
+            <!-- Loading -->
+            <div id="loading" class="loading hidden">
+                <div class="spinner"></div>
+                <p>Analyzing department...</p>
+            </div>
+
+            <!-- Step 2: Review Proposal -->
+            <div id="step2" class="section hidden">
+                <div class="section-title">
+                    <span>👤</span>
+                    <span>Step 2: Review Proposal</span>
+                </div>
+                
+                <div class="employee-info">
+                    <h3 style="color: #667eea; margin-bottom: 15px;">🏆 Highest-Paid Employee</h3>
+                    <div class="info-grid" id="employeeInfo"></div>
+                </div>
+
+                <div class="proposal-box">
+                    <div class="proposal-type" id="proposalType"></div>
+                    <div class="proposal-details" id="proposalDetails"></div>
+                </div>
+            </div>
+
+            <!-- Step 3: Make Decision -->
+            <div id="step3" class="section hidden">
+                <div class="section-title">
+                    <span>✅</span>
+                    <span>Step 3: Make Your Decision</span>
+                </div>
+                
+                <div class="decision-buttons">
+                    <button class="btn btn-approve" onclick="makeDecision('approve')">
+                        ✅ Approve
+                    </button>
+                    <button class="btn btn-reject" onclick="makeDecision('reject')">
+                        ❌ Reject
+                    </button>
+                    <button class="btn btn-modify" onclick="showModifyForm()">
+                        📝 Modify
+                    </button>
+                </div>
+
+                <div id="modifyForm" class="modify-form hidden">
+                    <h3 style="margin-bottom: 15px;">Modify Proposal</h3>
+                    <div id="modifyInputs"></div>
+                    <button class="btn" onclick="submitModification()">Submit Modification</button>
+                </div>
+            </div>
+
+            <!-- Step 4: Result -->
+            <div id="step4" class="section hidden">
+                <div class="section-title">
+                    <span>📋</span>
+                    <span>Result</span>
+                </div>
+                <div id="resultBox"></div>
+                <button class="btn" onclick="resetWorkflow()">Start New Analysis</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedDepartment = null;
+        let currentProposal = null;
+        let currentEmployees = null;
+
+        function selectDepartment(dept, element) {
+            selectedDepartment = dept;
+            
+            // Update UI
+            document.querySelectorAll('.dept-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            
+            document.getElementById('analyzeBtn').disabled = false;
+        }
+
+        async function analyzeDepartment() {
+            if (!selectedDepartment) return;
+
+            // Show loading
+            document.getElementById('step1').classList.add('hidden');
+            document.getElementById('loading').classList.remove('hidden');
+
+            try {
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({department: selectedDepartment})
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Store data
+                    currentProposal = data.proposal;
+                    currentEmployees = data.employees;
+
+                    // Display employee info
+                    const empInfo = data.highest_paid;
+                    document.getElementById('employeeInfo').innerHTML = `
+                        <div class="info-item">
+                            <div class="info-label">Name</div>
+                            <div class="info-value">${empInfo.name}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Position</div>
+                            <div class="info-value">${empInfo.position}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Department</div>
+                            <div class="info-value">${empInfo.department}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Current Salary</div>
+                            <div class="info-value rupee">₹${empInfo.salary.toLocaleString('en-IN')}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Manager</div>
+                            <div class="info-value">${empInfo.manager}</div>
+                        </div>
+                    `;
+
+                    // Display proposal
+                    if (data.proposal.type === 'salary_hike') {
+                        const details = data.proposal.details;
+                        document.getElementById('proposalType').textContent = '📊 Salary Hike Proposal';
+                        document.getElementById('proposalDetails').innerHTML = `
+                            <p><strong>Employee:</strong> ${details.employee_name}</p>
+                            <p><strong>Current Salary:</strong> <span class="rupee">₹${details.current_salary.toLocaleString('en-IN')}</span></p>
+                            <p><strong>Proposed Salary:</strong> <span class="rupee">₹${details.proposed_salary.toLocaleString('en-IN')}</span></p>
+                            <p><strong>Increase:</strong> ${details.increase_percentage}% (₹${(details.proposed_salary - details.current_salary).toLocaleString('en-IN')})</p>
+                            <p><strong>Reason:</strong> ${details.reason}</p>
+                        `;
+                    } else {
+                        const details = data.proposal.details;
+                        document.getElementById('proposalType').textContent = '👔 Manager Change Proposal';
+                        document.getElementById('proposalDetails').innerHTML = `
+                            <p><strong>Employee:</strong> ${details.employee_name}</p>
+                            <p><strong>Current Manager:</strong> ${details.current_manager}</p>
+                            <p><strong>Proposed Manager:</strong> ${details.proposed_manager}</p>
+                            <p><strong>Reason:</strong> ${details.reason}</p>
+                        `;
+                    }
+
+                    // Show steps 2 and 3
+                    document.getElementById('loading').classList.add('hidden');
+                    document.getElementById('step2').classList.remove('hidden');
+                    document.getElementById('step3').classList.remove('hidden');
+                }
+            } catch (error) {
+                alert('Error analyzing department: ' + error.message);
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('step1').classList.remove('hidden');
+            }
+        }
+
+        async function makeDecision(decision) {
+            try {
+                const response = await fetch('/decide', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({decision: decision})
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showResult(data.status, data.message);
+                }
+            } catch (error) {
+                alert('Error processing decision: ' + error.message);
+            }
+        }
+
+        function showModifyForm() {
+            const form = document.getElementById('modifyForm');
+            const inputs = document.getElementById('modifyInputs');
+            
+            if (currentProposal.type === 'salary_hike') {
+                const details = currentProposal.details;
+                inputs.innerHTML = `
+                    <div class="form-group">
+                        <label class="form-label">Current Salary: ₹${details.current_salary.toLocaleString('en-IN')}</label>
+                        <label class="form-label">Proposed Salary: ₹${details.proposed_salary.toLocaleString('en-IN')}</label>
+                        <label class="form-label">Enter New Salary:</label>
+                        <input type="number" id="modifiedSalary" class="form-input" 
+                               min="${details.current_salary}" 
+                               value="${details.proposed_salary}" 
+                               placeholder="Enter salary amount">
+                    </div>
+                `;
+            } else {
+                const details = currentProposal.details;
+                const managerOptions = currentEmployees
+                    .filter(e => e.Employee_ID !== details.employee_id)
+                    .map(e => `<option value="${e.Name}">${e.Name}</option>`)
+                    .join('');
+                
+                inputs.innerHTML = `
+                    <div class="form-group">
+                        <label class="form-label">Current Manager: ${details.current_manager}</label>
+                        <label class="form-label">Select New Manager:</label>
+                        <select id="modifiedManager" class="form-input">
+                            <option value="${details.proposed_manager}">${details.proposed_manager}</option>
+                            ${managerOptions}
+                        </select>
+                    </div>
+                `;
+            }
+            
+            form.classList.remove('hidden');
+        }
+
+        async function submitModification() {
+            let modification = {};
+            
+            if (currentProposal.type === 'salary_hike') {
+                modification = {
+                    modified_salary: parseInt(document.getElementById('modifiedSalary').value)
+                };
+            } else {
+                modification = {
+                    modified_manager: document.getElementById('modifiedManager').value
+                };
+            }
+
+            try {
+                const response = await fetch('/decide', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        decision: 'modify',
+                        modification: modification
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showResult(data.status, data.message);
+                }
+            } catch (error) {
+                alert('Error submitting modification: ' + error.message);
+            }
+        }
+
+        function showResult(status, message) {
+            document.getElementById('step2').classList.add('hidden');
+            document.getElementById('step3').classList.add('hidden');
+            document.getElementById('step4').classList.remove('hidden');
+            
+            let className = 'result-box ';
+            if (status === 'approved') className += 'result-approved';
+            else if (status === 'rejected') className += 'result-rejected';
+            else if (status === 'modified') className += 'result-modified';
+            
+            document.getElementById('resultBox').className = className;
+            document.getElementById('resultBox').textContent = message;
+        }
+
+        function resetWorkflow() {
+            location.reload();
+        }
+    </script>
+</body>
+</html>
