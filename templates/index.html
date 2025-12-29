@@ -291,6 +291,66 @@
             font-weight: bold;
             color: #667eea;
         }
+
+        /* History Styles */
+        .history-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .history-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        .badge-approved {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .badge-modified {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .value-change {
+            background: #fff3cd;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border-left: 3px solid #ffc107;
+        }
+
+        .value-original {
+            text-decoration: line-through;
+            color: #999;
+            display: block;
+        }
+
+        .value-modified {
+            font-weight: bold;
+            color: #856404;
+            display: block;
+            margin-top: 5px;
+        }
     </style>
 </head>
 
@@ -399,23 +459,20 @@
         let selectedDepartment = null;
         let currentProposal = null;
         let currentEmployees = null;
+        let currentModification = null;
 
         function selectDepartment(dept, element) {
             selectedDepartment = dept;
-
-            // Update UI
             document.querySelectorAll('.dept-card').forEach(card => {
                 card.classList.remove('selected');
             });
             element.classList.add('selected');
-
             document.getElementById('analyzeBtn').disabled = false;
         }
 
         async function analyzeDepartment() {
             if (!selectedDepartment) return;
 
-            // Show loading
             document.getElementById('step1').classList.add('hidden');
             document.getElementById('loading').classList.remove('hidden');
 
@@ -429,11 +486,9 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    // Store data
                     currentProposal = data.proposal;
                     currentEmployees = data.employees;
 
-                    // Display employee info
                     const empInfo = data.highest_paid;
                     document.getElementById('employeeInfo').innerHTML = `
                         <div class="info-item">
@@ -458,7 +513,6 @@
                         </div>
                     `;
 
-                    // Display proposal
                     if (data.proposal.type === 'salary_hike') {
                         const details = data.proposal.details;
                         document.getElementById('proposalType').textContent = '📊 Salary Hike Proposal';
@@ -480,7 +534,6 @@
                         `;
                     }
 
-                    // Show steps 2 and 3
                     document.getElementById('loading').classList.add('hidden');
                     document.getElementById('step2').classList.remove('hidden');
                     document.getElementById('step3').classList.remove('hidden');
@@ -503,7 +556,7 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    showResult(data.status, data.message);
+                    showResult(data.status, data.message, null);
                 }
             } catch (error) {
                 alert('Error processing decision: ' + error.message);
@@ -556,10 +609,12 @@
                 modification = {
                     modified_salary: parseInt(document.getElementById('modifiedSalary').value)
                 };
+                currentModification = modification.modified_salary;
             } else {
                 modification = {
                     modified_manager: document.getElementById('modifiedManager').value
                 };
+                currentModification = modification.modified_manager;
             }
 
             try {
@@ -575,14 +630,30 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    showResult(data.status, data.message);
+                    showResult(data.status, data.message, modification);
                 }
             } catch (error) {
                 alert('Error submitting modification: ' + error.message);
             }
         }
 
-        function showResult(status, message) {
+        function showResult(status, message, modification) {
+            // Save to history
+            const historyEntry = {
+                timestamp: new Date().toLocaleString('en-IN'),
+                department: selectedDepartment,
+                employee: currentProposal.details.employee_name,
+                type: currentProposal.type,
+                status: status,
+                message: message,
+                original: JSON.parse(JSON.stringify(currentProposal.details)),
+                modified: modification
+            };
+
+            let history = JSON.parse(localStorage.getItem('workflowHistory') || '[]');
+            history.unshift(historyEntry);
+            localStorage.setItem('workflowHistory', JSON.stringify(history));
+
             document.getElementById('step2').classList.add('hidden');
             document.getElementById('step3').classList.add('hidden');
             document.getElementById('step4').classList.remove('hidden');
@@ -594,11 +665,110 @@
 
             document.getElementById('resultBox').className = className;
             document.getElementById('resultBox').textContent = message;
+
+            updateHistoryDisplay();
         }
+
+        // UPDATED updateHistoryDisplay function
+// Replace lines 672-728 in your index.html with this code:
+
+function updateHistoryDisplay() {
+    const historyContainer = document.getElementById('workflowHistory');
+    const historySection = document.getElementById('historySection');
+    const history = JSON.parse(localStorage.getItem('workflowHistory') || '[]');
+
+    if (history.length === 0) {
+        historySection.classList.add('hidden');
+        return;
+    }
+
+    historySection.classList.remove('hidden');
+
+    historyContainer.innerHTML = history.map((entry, index) => {
+        const badgeClass = entry.status === 'approved' ? 'badge-approved' :
+            entry.status === 'rejected' ? 'badge-rejected' : 'badge-modified';
+
+        let detailsHTML = `
+            <div style="margin: 8px 0;"><strong>Department:</strong> ${entry.department}</div>
+            <div style="margin: 8px 0;"><strong>Employee:</strong> ${entry.employee}</div>
+            <div style="margin: 8px 0;"><strong>Time:</strong> ${entry.timestamp}</div>
+        `;
+
+        // Show details for ALL statuses (Modified, Approved, Rejected)
+        if (entry.type === 'salary_hike') {
+            if (entry.status === 'modified' && entry.modified) {
+                // MODIFIED: Show original vs modified
+                detailsHTML += `
+                    <div class="value-change">
+                        <div><strong>Salary Change:</strong></div>
+                        <div class="value-original">Original Proposed: ₹${entry.original.proposed_salary.toLocaleString('en-IN')}</div>
+                        <div class="value-modified">Modified To: ₹${entry.modified.modified_salary.toLocaleString('en-IN')}</div>
+                    </div>
+                `;
+            } else {
+                // APPROVED or REJECTED: Show what was proposed
+                const boxColor = entry.status === 'approved' ? '#d4edda' : '#f8d7da';
+                const borderColor = entry.status === 'approved' ? '#28a745' : '#dc3545';
+                detailsHTML += `
+                    <div style="background: ${boxColor}; padding: 10px; border-radius: 5px; margin: 10px 0; border-left: 3px solid ${borderColor};">
+                        <div><strong>${entry.status === 'approved' ? 'Approved' : 'Rejected'} Salary Hike:</strong></div>
+                        <div style="margin-top: 5px;">Current: ₹${entry.original.current_salary.toLocaleString('en-IN')}</div>
+                        <div style="font-weight: bold; margin-top: 3px;">Proposed: ₹${entry.original.proposed_salary.toLocaleString('en-IN')} (+${entry.original.increase_percentage}%)</div>
+                    </div>
+                `;
+            }
+        } else {
+            // Manager change
+            if (entry.status === 'modified' && entry.modified) {
+                // MODIFIED: Show original vs modified
+                detailsHTML += `
+                    <div class="value-change">
+                        <div><strong>Manager Change:</strong></div>
+                        <div class="value-original">Original Proposed: ${entry.original.proposed_manager}</div>
+                        <div class="value-modified">Modified To: ${entry.modified.modified_manager}</div>
+                    </div>
+                `;
+            } else {
+                // APPROVED or REJECTED: Show what was proposed
+                const boxColor = entry.status === 'approved' ? '#d4edda' : '#f8d7da';
+                const borderColor = entry.status === 'approved' ? '#28a745' : '#dc3545';
+                detailsHTML += `
+                    <div style="background: ${boxColor}; padding: 10px; border-radius: 5px; margin: 10px 0; border-left: 3px solid ${borderColor};">
+                        <div><strong>${entry.status === 'approved' ? 'Approved' : 'Rejected'} Manager Change:</strong></div>
+                        <div style="margin-top: 5px;">From: ${entry.original.current_manager}</div>
+                        <div style="font-weight: bold; margin-top: 3px;">To: ${entry.original.proposed_manager}</div>
+                    </div>
+                `;
+            }
+        }
+
+        return `
+            <div class="history-item">
+                <div class="history-header">
+                    <span>Workflow #${history.length - index}</span>
+                    <span class="history-badge ${badgeClass}">${entry.status.toUpperCase()}</span>
+                </div>
+                ${detailsHTML}
+            </div>
+        `;
+    }).join('');
+}
+
+// INSTRUCTIONS:
+// 1. Open templates/index.html
+// 2. Find the function updateHistoryDisplay() around line 672
+// 3. Replace the entire function with the code above
+// 4. Save the file
+// 5. Restart: python web_app.py
+// 6. Now APPROVED and REJECTED will also show what salary/manager was approved or rejected!
+
 
         function resetWorkflow() {
             location.reload();
         }
+
+        // Load history on page load
+        window.addEventListener('DOMContentLoaded', updateHistoryDisplay);
     </script>
 </body>
 

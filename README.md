@@ -1,104 +1,46 @@
 # HITL Salary Management System 💼
 
-A **Human-in-the-Loop (HITL)** workflow demonstration using **LangGraph** and **Streamlit** for salary management decisions. This POC showcases how to build intelligent workflows that pause for human judgment before executing critical business actions.
+A **Human-in-the-Loop (HITL)** workflow system using **LangGraph** and **Flask** for salary management decisions. This project demonstrates how AI-powered workflows can pause for human judgment before executing critical business actions.
 
-<div align="center">
-
-![Status](https://img.shields.io/badge/Status-Production%20Ready%20POC-green)
-![LangGraph](https://img.shields.io/badge/LangGraph-Workflow%20Orchestration-blue)
-![Streamlit](https://img.shields.io/badge/Streamlit-Interactive%20UI-red)
-![Python](https://img.shields.io/badge/Python-3.8+-yellow)
-
-</div>
+![Status](https://img.shields.io/badge/Status-Production%20Ready-green) ![Flask](https://img.shields.io/badge/Flask-Web%20UI-blue) ![LangGraph](https://img.shields.io/badge/LangGraph-Workflow-orange)
 
 ---
 
-## 🎯 What This Project Demonstrates
+## 🎯 What This System Does
 
-This system demonstrates a **complete Human-in-the-Loop workflow** where:
-- AI analyzes data and generates proposals
-- **Workflow pauses** automatically for human review
-- Humans can **Approve**, **Reject**, or **Modify** AI suggestions
-- The system executes decisions and maintains complete audit logs
+**AI analyzes → Workflow pauses ⏸️ → Human decides → System executes**
 
-**Real-world use case:** HR managers reviewing and approving salary changes and team restructuring.
-
----
-
-## 🏗️ Architecture & Approach
-
-### Core Components
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    Streamlit UI Layer                        │
-│  (Data Viz, Department Analysis, Approval Interface)        │
-└────────────────────┬────────────────────────────────────────┘
-                     │
-┌────────────────────▼────────────────────────────────────────┐
-│                  LangGraph Workflow                          │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
-│  │  Load    │→ │ Analyze  │→ │  HITL    │→ │ Process  │   │
-│  │  Data    │  │  Dept    │  │Interrupt │  │ Decision │   │
-│  └──────────┘  └──────────┘  └──────────┘  └──────────┘   │
-│                                    ↑ Pause for Human        │
-└────────────────────┬────────────────────────────────────────┘
-                     │
-┌────────────────────▼────────────────────────────────────────┐
-│                   Data Layer (Excel)                         │
-│         Employee Data, Salaries, Departments                 │
-└─────────────────────────────────────────────────────────────┘
-```
-
-### HITL Workflow Pattern
-
-1. **Load Data** → Reads employee data from Excel by department
-2. **Analyze Department** → Identifies highest-paid employee, generates proposal
-3. **HITL Interrupt** ⏸️ → Workflow pauses, waits for human decision
-4. **Human Decision** → User chooses: Approve ✅ / Reject ❌ / Modify 📝
-5. **Process Decision** → Executes the choice and logs the outcome
-
-### State Management (LangGraph)
-
-```python
-WorkflowState = {
-    department: str,              # Selected department
-    employees: List[Dict],        # Employee data
-    highest_paid: Dict,           # Highest-paid employee
-    proposal_type: str,           # 'salary_hike' or 'manager_change'
-    proposal_details: Dict,       # Proposal specifics
-    human_decision: str,          # 'approve', 'reject', or 'modify'
-    modification_details: Dict,   # Modified values if applicable
-    final_status: str,            # Outcome
-    execution_log: List[str]      # Audit trail
-}
-```
+This is a complete demonstration of the HITL pattern where:
+- AI analyzes employee data and generates salary/manager change proposals
+- Workflow **automatically pauses** for human review
+- Humans can **Approve** ✅, **Reject** ❌, or **Modify** 📝 the proposals
+- System tracks complete history showing what was changed
 
 ---
 
-## ✨ Features Implemented
+## ✨ Key Features
 
-### 🔄 Three Decision Paths
-- **Approve** ✅ - Accept proposal as-is
-- **Reject** ❌ - Decline the proposal
-- **Modify** 📝 - Adjust salary amount or manager choice
+### 🎨 **Beautiful Web Interface**
+- Modern gradient design with purple theme
+- Responsive card-based layout
+- Smooth animations and hover effects
+- Color-coded status indicators
 
-### 📊 Two Proposal Types
-1. **Salary Hike** - Proposes 15% salary increase for top performer
-2. **Manager Change** - Suggests reassignment to different manager
+### 📜 **Workflow History**
+- Shows ALL previous decisions
+- **Displays original vs modified values** for modifications
+- Shows proposal details for approved and rejected workflows
+- Color-coded badges (Green/Red/Yellow)
+- Persistent storage using localStorage
 
+### 🔄 **Three Decision Paths**
+1. **Approve** ✅ - Accept the AI proposal as-is
+2. **Reject** ❌ - Decline the proposal
+3. **Modify** 📝 - Change the proposed values before executing
 
-### 📈 Interactive UI
-- **Data Overview Tab** - Employee list, salary distribution charts, statistics
-- **Department Analysis Tab** - Analyze any department, see proposal
-- **Approval Interface Tab** - Make decisions with interactive forms
-- **Workflow History Tab** - Complete audit trail of all decisions
-
-### 🔍 Complete Observability
-- Execution logs at each step
-- Workflow state persistence
-- Full decision history
-- Visual status indicators
+### 📊 **Two Proposal Types**
+- **Salary Hike** - AI proposes percentage increase with justification
+- **Manager Change** - AI suggests reassignment to different manager
 
 ---
 
@@ -114,70 +56,165 @@ WorkflowState = {
 # Navigate to project directory
 cd d:\POCs\salary-hitl-system
 
+# Activate virtual environment (if using one)
+venv\Scripts\activate
+
 # Install dependencies
 pip install -r requirements.txt
+```
 
-# Generate dummy employee data
+### Generate Sample Data
+
+```bash
+# Creates data/salary_data.xlsx with 31 employees
 python generate_data.py
 ```
 
 ### Run the Application
 
 ```bash
-streamlit run app.py
+# Start Flask web server
+python web_app.py
 ```
 
-The application will open at `http://localhost:8501`
+The application will start at **http://localhost:5000**
 
 ---
 
 ## 📖 How to Use
 
-### Step 1: View Data (Data Overview Tab)
-- Browse all employee records
-- See salary distribution by department
-- Review department statistics
+### Step 1: Select Department
+- View all departments with employee count and average salary
+- Click on any department card to select it
+- Click **"🔍 Analyze Department"**
 
-### Step 2: Analyze a Department (Department Analysis Tab)
-1. Select a department from dropdown
-2. Click **"🔍 Analyze Department"**
-3. System identifies highest-paid employee
-4. AI generates a proposal (salary hike or manager change)
+### Step 2: Review Proposal
+System shows:
+- 🏆 **Highest-paid employee** details (name, position, current salary, manager)
+- 📊 **AI-generated proposal** with reasoning
 
-### Step 3: Make a Decision (Approval Interface Tab)
+**Example Salary Hike Proposal:**
+```
+Employee: Rohan Malhotra
+Current Salary: ₹16,544,831
+Proposed Salary: ₹19,026,555
+Increase: 15% (₹2,481,724)
+Reason: Top performer in Finance department
+```
+
+### Step 3: Make Your Decision
 
 **Option A: Approve** ✅
-- Review the proposal
-- Click **"✅ Approve"**
-- System executes immediately
+- Click "✅ Approve"
+- Proposal executes immediately
+- History shows: "Approved Salary Hike: Current: ₹16.5L → Proposed: ₹19L (+15%)"
 
 **Option B: Reject** ❌
-- Click **"❌ Reject"**
-- Proposal is declined and logged
+- Click "❌ Reject"
+- Proposal is declined
+- History shows: "Rejected Salary Hike: Proposed ₹19L was not approved"
 
 **Option C: Modify** 📝
-- Click **"📝 Modify"**
-- Adjust the proposed values:
-  - For salary hike: Enter new salary amount
-  - For manager change: Select different manager
-- Submit the modification
+- Click "📝 Modify"
+- Enter new values:
+  - For salary: Enter custom amount
+  - For manager: Select from dropdown
+- Click "Submit Modification"
+- History shows: "Original: ₹19L → Modified: ₹18L"
 
-### Step 4: Review History (Workflow History Tab)
-- See all completed workflows
-- Review execution logs
-- Audit decision trail
+### Step 4: View History
+Scroll down to see **Workflow History** section showing:
+- All previous workflows numbered (#1, #2, #3...)
+- Department, employee, timestamp
+- Status badge (APPROVED/REJECTED/MODIFIED)
+- **Original vs modified values** highlighted
 
 ---
 
-## 🛠️ Technical Stack
+## 📊 Workflow History Examples
+
+### Modified Salary:
+```
+Workflow #3 - MODIFIED
+Department: Finance
+Employee: Rohan Malhotra
+Time: 29/12/2025, 3:15 PM
+
+Salary Change:
+Original Proposed: ₹19,026,555  (crossed out)
+Modified To: ₹18,000,000        (bold)
+```
+
+### Approved:
+```
+Workflow #2 - APPROVED
+Department: Engineering
+Employee: Arjun Patel
+Time: 29/12/2025, 3:10 PM
+
+✅ Approved Salary Hike:
+Current: ₹9,500,000
+Proposed: ₹10,925,000 (+15%)
+```
+
+### Rejected:
+```
+Workflow #1 - REJECTED
+Department: HR
+Employee: Priya Singh
+Time: 29/12/2025, 3:05 PM
+
+❌ Rejected Manager Change:
+From: Amit Kumar
+To: Rajesh Sharma
+```
+
+---
+
+## 🏗️ Technical Architecture
+
+```
+┌─────────────────────────────────────────┐
+│         Flask Web Server                 │
+│  (web_app.py - API endpoints)           │
+└────────────┬────────────────────────────┘
+             │
+┌────────────▼────────────────────────────┐
+│         HTML/CSS/JavaScript              │
+│  (templates/index.html)                  │
+│  - Beautiful UI                          │
+│  - Workflow history                      │
+│  - localStorage for persistence          │
+└────────────┬────────────────────────────┘
+             │
+┌────────────▼────────────────────────────┐
+│         LangGraph Workflow               │
+│  ┌──────┐  ┌──────┐  ┌─────┐  ┌─────┐ │
+│  │Load  │→ │Analyze│→ │HITL │→ │Process│
+│  │Data  │  │Dept  │  │Pause│  │Decision│
+│  └──────┘  └──────┘  └─────┘  └─────┘ │
+│              ↑ AI proposes              │
+│              ⏸️ Pauses here for human   │
+└────────────┬────────────────────────────┘
+             │
+┌────────────▼────────────────────────────┐
+│         Excel Data Layer                 │
+│      data/salary_data.xlsx               │
+└─────────────────────────────────────────┘
+```
+
+---
+
+## 🛠️ Technology Stack
 
 | Component | Technology | Purpose |
 |-----------|-----------|---------|
-| **Workflow Engine** | LangGraph | State management, conditional routing, HITL interrupts |
-| **UI Framework** | Streamlit | Interactive web interface |
-| **Data Handling** | Pandas, OpenPyXL | Excel file operations, data manipulation |
-| **Visualization** | Plotly | Interactive charts and graphs |
-| **State Storage** | MemorySaver | Workflow checkpointing and persistence |
+| **Backend** | Flask | Lightweight web server |
+| **Workflow Engine** | LangGraph | State management, HITL interrupts |
+| **Frontend** | HTML/CSS/JS | Modern responsive UI |
+| **Data** | Pandas + Excel | Employee data handling |
+| **State Persistence** | MemorySaver | Workflow checkpointing |
+| **History Storage** | localStorage | Browser-side history |
 
 ---
 
@@ -185,41 +222,47 @@ The application will open at `http://localhost:8501`
 
 ```
 salary-hitl-system/
+├── web_app.py              # Flask server (API endpoints)
+├── templates/
+│   └── index.html          # Web UI with workflow history
 ├── src/
-│   ├── state.py           # TypedDict state schema
-│   ├── nodes.py           # Workflow node functions
-│   │   ├── load_data_node()
-│   │   ├── analyze_department_node()
-│   │   ├── human_approval_node()      ← HITL interrupt
-│   │   ├── process_approval_node()
-│   │   ├── process_rejection_node()
-│   │   └── process_modification_node()
-│   └── workflow.py        # LangGraph workflow definition
-│
+│   ├── state.py            # Workflow state schema
+│   ├── nodes.py            # Workflow logic nodes
+│   └── workflow.py         # LangGraph graph definition
 ├── data/
-│   └── salary_data.xlsx   # Employee dataset
-│
-├── app.py                 # Streamlit application
-├── generate_data.py       # Data generation script
-├── requirements.txt       # Python dependencies
-├── README.md             # This file
+│   └── salary_data.xlsx    # Employee data
+├── generate_data.py        # Data generator script
+├── requirements.txt        # Python dependencies
+└── README.md              # This file
 ```
 
 ---
 
-## 🎓 Key Concepts Demonstrated
+## 🎓 Key HITL Concepts Demonstrated
 
-### 1. Human-in-the-Loop Pattern
-The workflow uses `interrupt_before=["human_approval"]` to pause execution:
+### 1. **Workflow Interrupts**
 ```python
 compiled_workflow = workflow.compile(
     checkpointer=memory,
-    interrupt_before=["human_approval"]  # Stops here for human input
+    interrupt_before=["human_approval"]  # Pauses here
 )
 ```
 
-### 2. Conditional Routing
-Different decisions route to different processing nodes:
+### 2. **State Persistence**
+```python
+config = {"configurable": {"thread_id": "unique_id"}}
+# State is saved automatically at interrupt point
+```
+
+### 3. **Human Decision Integration**
+```python
+# Update state with human choice
+graph.update_state(config, {"human_decision": "approve"})
+# Resume workflow
+graph.stream(None, config)
+```
+
+### 4. **Conditional Routing**
 ```python
 def route_decision(state):
     if state["human_decision"] == "approve":
@@ -230,164 +273,183 @@ def route_decision(state):
         return "process_modification"
 ```
 
-### 3. State Persistence
-LangGraph's checkpointing maintains state across interactions:
-```python
-memory = MemorySaver()
-config = {"configurable": {"thread_id": "thread_1"}}
-```
+---
 
-### 4. Update State Mid-Flow
-Human decisions update state while workflow is paused:
-```python
-graph.update_state(config, {"human_decision": "approve"})
-graph.stream(None, config)  # Resume workflow
-```
+## 🔮 Use Cases Beyond Salary Management
+
+This HITL pattern applies to:
+- 💰 **Loan Approvals** - AI recommends, banker approves
+- 📝 **Content Moderation** - AI flags, human reviews
+- 🏥 **Medical Diagnosis** - AI suggests, doctor confirms
+- ⚖️ **Legal Contracts** - AI drafts, lawyer approves
+- 📈 **Trading Decisions** - AI signals, trader executes
+- 🛡️ **Security Alerts** - AI detects, analyst investigates
 
 ---
 
-## 🔮 Future Enhancements
+## 📊 Sample Data
 
-### 🤖 LLM Integration (When Data Is Available)
-**Current:** Rule-based proposals  
-**Future:** Intelligent proposals using LLM with:
-- Performance review history
-- Market salary benchmarks
-- Team dynamics analysis
-- Personalized justifications
+The system uses Indian employee data:
 
-**When to add:** Once you have real employee data including performance reviews, tenure, achievements, and historical salary data.
-
-### ⚖️ Rules Engine
-**Current:** Manual review for all proposals  
-**Future:** Automated validation and auto-approval:
-
-**Validation Rules:**
-- Block raises exceeding 25%
-- Prevent manager changes within 6 months
-- Ensure salary caps by position
-
-**Auto-Approve Rules:**
-- Small raises under ₹50,000
-- Routine transfers with same grade
-- Budget-approved promotions
-
-**Warning Rules:**
-- Alert if salary exceeds ₹1.5 crore
-- Flag if employee has performance warnings
-- Check against department budget
-
-### 📊 Enhanced Analytics
-- Department budget tracking
-- Salary trend analysis
-- Approval rate metrics
-- Time-to-decision analytics
-- Comparative salary reports
-
-### 🔐 Multi-Level Approval
-- Manager approval → HR approval → CFO approval
-- Different authority levels for different amounts
-- Escalation workflows for exceptions
-
-### 📧 Notifications
-- Email alerts for pending approvals
-- Slack integration for team updates
-- SMS for urgent decisions
-
-### 🗄️ Database Integration
-- Replace Excel with PostgreSQL/MongoDB
-- Real-time data sync
-- Historical tracking and versioning
-
----
-
-## 💡 Why This Approach?
-
-### ✅ Advantages
-
-**1. Demonstrates HITL Pattern Clearly**
-- Clean separation of AI and human decision points
-- Easy to understand workflow structure
-- Shows value of human oversight
-
-**2. Production-Ready Architecture**
-- Scalable state management
-- Proper error handling
-- Complete audit trails
-
-**3. Technology Stack Relevance**
-- LangGraph is purpose-built for agent workflows
-- Streamlit enables rapid UI development
-- Pattern applies to many use cases
-
-**4. Easy to Extend**
-- Add new proposal types easily
-- Integrate with real HR systems
-- Scale to multiple approval levels
-
-### 🎯 Use Cases Beyond Salary Management
-
-This same HITL pattern can be applied to:
-- **Loan Approvals** - Review AI-recommended loan decisions
-- **Content Moderation** - Human review of flagged content
-- **Medical Diagnosis** - Doctor reviews AI diagnosis suggestions
-- **Legal Document Review** - Lawyer approves AI-drafted contracts
-- **Financial Trading** - Trader approves AI-suggested trades
-- **Customer Support** - Agent reviews AI-generated responses
-
----
-
-## 🧪 Testing
-
-See [TESTING_GUIDE.md](TESTING_GUIDE.md) for comprehensive testing instructions.
-
-**Quick Test:**
-1. Analyze Finance department
-2. Approve the proposal → See green success message
-3. Analyze HR department  
-4. Reject the proposal → See red rejection message
-5. Analyze Marketing department
-6. Modify the proposal → See yellow modification message
-
-All three paths should work correctly with proper state management.
-
----
-
-## 📊 Data Format
-
-The Excel file contains:
-
-| Column | Description | Example |
-|--------|-------------|---------|
+| Field | Description | Example |
+|-------|-------------|---------|
 | Employee_ID | Unique identifier | 1001 |
-| Name | Full name | Rajesh Sharma |
-| Department | Department name | Engineering |
-| Position | Job title | Senior Software Engineer |
-| Current_Salary | Annual salary in ₹ | 9500000 |
+| Name | Indian names | Rajesh Sharma, Priya Singh |
+| Department | Department name | Engineering, Finance, HR |
+| Position | Job title | Software Engineer, CFO |
+| Current_Salary | Annual salary (₹) | ₹9,500,000 |
 | Manager | Manager name | Ramesh Iyer |
 | Join_Date | Date joined | 2020-03-15 |
 
----
-
-## 🤝 Contributing
-
-To extend this POC:
-
-**Add New Proposal Types:**
-1. Define logic in `analyze_department_node()`
-2. Add processing in new node function
-3. Update conditional routing
-4. Add UI elements in Streamlit
-
-**Integrate Real Data:**
-1. Replace `generate_data.py` with real data loader
-2. Update Excel file path in `nodes.py`
-3. Adjust proposal logic based on available fields
-
-**Add Rules:**
-1. Create `config/rules.json` with validation rules
-2. Add `evaluate_rules_node()` in workflow
-3. Update UI to display rule violations
+**Salary Ranges (in Rupees):**
+- Software Engineer: ₹58L - ₹75L
+- Senior Software Engineer: ₹79L - ₹1Cr
+- Engineering Manager: ₹1.16Cr - ₹1.41Cr
+- CFO: ₹1.25Cr - ₹1.66Cr
 
 ---
 
+## 🎨 UI Design Features
+
+### Color Scheme
+- **Primary:** Purple gradient (#667eea → #764ba2)
+- **Success:** Green (#d4edda, #28a745)
+- **Danger:** Red (#f8d7da, #dc3545)
+- **Warning:** Yellow (#fff3cd, #ffc107)
+
+### Interactive Elements
+- Hover effects on department cards
+- Smooth transitions and animations
+- Responsive grid layout
+- Color-coded status badges
+- Value comparison highlights
+
+### Accessibility
+- Clear typography (Segoe UI)
+- High contrast for readability
+- Responsive design (mobile-friendly)
+- Intuitive button placement
+
+---
+
+## 🧪 Testing Workflow
+
+**Test All Three Decision Paths:**
+
+1. **Approve Test:**
+   - Select Finance department
+   - Click Analyze
+   - Click ✅ Approve
+   - Check history shows green "APPROVED" badge with proposal details
+
+2. **Reject Test:**
+   - Select HR department
+   - Click Analyze  
+   - Click ❌ Reject
+   - Check history shows red "REJECTED" badge with what was rejected
+
+3. **Modify Test:**
+   - Select Engineering department
+   - Click Analyze
+   - Click 📝 Modify
+   - Change salary to custom amount (e.g., 18000000)
+   - Submit
+   - Check history shows yellow "MODIFIED" with original vs modified values
+
+---
+
+## 🔧 Configuration
+
+### Port Configuration
+Default: `5000`
+
+To change port, edit `web_app.py`:
+```python
+app.run(debug=True, port=YOUR_PORT)
+```
+
+### Data Configuration
+To regenerate data with different parameters, edit `generate_data.py`:
+```python
+num_employees = 31  # Change employee count
+departments = [...]  # Add/remove departments
+salary_ranges = {...}  # Adjust salary ranges
+```
+
+---
+
+## 📝 Dependencies
+
+```
+flask==3.0.0
+langgraph==0.0.1
+langchain-core==0.1.0
+pandas==2.0.0
+openpyxl==3.1.0
+```
+
+Install all: `pip install -r requirements.txt`
+
+---
+
+## 🚦 Troubleshooting
+
+**Port 5000 already in use:**
+```bash
+# Change port in web_app.py or kill process
+netstat -ano | findstr :5000
+taskkill /PID <PID> /F
+```
+
+**Data file not found:**
+```bash
+# Regenerate data
+python generate_data.py
+```
+
+**History not showing:**
+- Clear browser localStorage: F12 → Application → Local Storage → Clear
+- Refresh page
+- Make a new decision to populate history
+
+---
+
+## 📚 Additional Resources
+
+- **LangGraph Documentation:** https://langchain-ai.github.io/langgraph/
+- **Flask Documentation:** https://flask.palletsprojects.com/
+- **HITL Patterns:** Human-in-the-Loop AI systems
+
+---
+
+## 🤝 Alternative Interfaces
+
+This project also includes:
+
+**Streamlit UI:**
+```bash
+streamlit run app.py
+```
+
+**CLI Demo:**
+```bash
+python cli_demo.py
+```
+
+The Flask HTML UI is recommended for production use due to better customization and control.
+
+---
+
+## 📄 License
+
+Educational/Demo project for HITL workflow patterns with LangGraph.
+
+---
+
+<div align="center">
+
+**Built with ❤️ using Flask + LangGraph**
+
+**Status:** ✅ Production-Ready | Fully Functional HITL Workflow
+
+</div>
